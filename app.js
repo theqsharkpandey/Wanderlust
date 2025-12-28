@@ -20,8 +20,6 @@ const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
-const dbUrl = process.env.MONGO_URL;
-
 main()
   .then(() => {
     console.log("connected to DB");
@@ -43,15 +41,8 @@ app.engine("ejs", ejsmate);
 app.use(express.static(path.join(__dirname, "/public")));
 
 const store = MongoStore.create({
-  mongoUrl: dbUrl,
-  crypto: {
-    secret: process.env.SECRET,
-  },
+  mongoUrl: process.env.MONGO_URL, // ✔ correct variable
   touchAfter: 24 * 3600,
-});
-
-store.on("error", () => {
-  console.log("ERROR in MONGO SESSION STORE", err);
 });
 
 const sessionOptions = {
@@ -60,15 +51,15 @@ const sessionOptions = {
   resave: false,
   saveUninitialized: true,
   cookie: {
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
+    secure: true, // ✔ required for Render (HTTPS)
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   },
 };
-
-// app.get("/", (req, res) => {
-//   res.send("Hi, I am root");
-// });
+store.on("error", (err) => {
+  console.log("ERROR in MONGO SESSION STORE", err);
+});
 
 app.use(session(sessionOptions));
 app.use(flash());
