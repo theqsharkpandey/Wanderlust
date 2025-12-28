@@ -20,29 +20,18 @@ const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
+const dbUrl = process.env.MONGO_URL;
+
 main()
   .then(() => {
     console.log("connected to DB");
-
-    const initData = require("./init/data.js");
-    const Listing = require("./models/listing.js");
-
-    async function seedIfEmpty() {
-      const count = await Listing.countDocuments();
-      if (count === 0) {
-        await Listing.insertMany(initData.data);
-        console.log("Sample data inserted (DB was empty)");
-      }
-    }
-
-    mongoose.connection.once("open", seedIfEmpty);
   })
   .catch((err) => {
     console.log(err);
   });
 
 async function main() {
-  await mongoose.connect(process.env.MONGO_URL);
+  await mongoose.connect(dbUrl);
 }
 
 app.set("view engine", "ejs");
@@ -73,7 +62,6 @@ const sessionOptions = {
 store.on("error", (err) => {
   console.log("ERROR in MONGO SESSION STORE", err);
 });
-app.set("trust proxy", 1);
 
 app.use(session(sessionOptions));
 app.use(flash());
