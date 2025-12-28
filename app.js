@@ -47,6 +47,8 @@ const store = MongoStore.create({
   touchAfter: 24 * 3600,
 });
 
+app.set("trust proxy", 1);
+
 const sessionOptions = {
   store,
   secret: process.env.SESSION_SECRET,
