@@ -20,8 +20,6 @@ const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
-const dbUrl = process.env.MONGO_URL;
-
 main()
   .then(() => {
     console.log("connected to DB");
@@ -31,7 +29,7 @@ main()
   });
 
 async function main() {
-  await mongoose.connect(dbUrl);
+  await mongoose.connect(process.env.MONGO_URL);
 }
 
 app.set("view engine", "ejs");
@@ -55,13 +53,14 @@ const sessionOptions = {
   cookie: {
     httpOnly: true,
     secure: true, // ✔ required for Render (HTTPS)
-    sameSite: "lax",
+    sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   },
 };
 store.on("error", (err) => {
   console.log("ERROR in MONGO SESSION STORE", err);
 });
+app.set("trust proxy", 1);
 
 app.use(session(sessionOptions));
 app.use(flash());
