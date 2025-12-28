@@ -23,6 +23,19 @@ const userRouter = require("./routes/user.js");
 main()
   .then(() => {
     console.log("connected to DB");
+
+    const initData = require("./data.js");
+    const Listing = require("./models/listing.js");
+
+    async function seedIfEmpty() {
+      const count = await Listing.countDocuments();
+      if (count === 0) {
+        await Listing.insertMany(initData.data);
+        console.log("Sample data inserted (DB was empty)");
+      }
+    }
+
+    mongoose.connection.once("open", seedIfEmpty);
   })
   .catch((err) => {
     console.log(err);
