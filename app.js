@@ -24,7 +24,7 @@ main()
   .then(() => {
     console.log("connected to DB");
 
-    const initData = require("./data.js");
+    const initData = require("./init/data.js");
     const Listing = require("./models/listing.js");
 
     async function seedIfEmpty() {
